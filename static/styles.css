@@ -1,0 +1,11 @@
+html, body {
+  height: 100%;
+}
+
+.min-100 {
+    min-height: 100%;
+}
+
+.content {
+    background-color: pink;
+}
