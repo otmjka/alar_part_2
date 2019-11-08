@@ -18,3 +18,7 @@ async def root_handler(req):
 # cors.add(res_user.add_route('GET', user_handler), cors_headers)
 #
 # app.router.add_route('GET', '/api', api_handler)
+
+user='trifonovdmitry',
+                                 database='aiohttp_security',
+                                 host='127.0.0.1'
