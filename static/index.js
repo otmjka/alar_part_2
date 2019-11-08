@@ -6,7 +6,7 @@ console.log('epic!');
 function fetch(opts) {
   var body = opts.body,
       method = opts.method,
-      theUrl = opts.theUrl,
+      url = opts.url,
       callback = opts.callback,
       xmlHttp = new XMLHttpRequest()
 
@@ -15,13 +15,13 @@ function fetch(opts) {
           callback(xmlHttp.responseText);
   }
 
-  xmlHttp.open(method, theUrl, true); // true for asynchronous
+  xmlHttp.open(method, url, true); // true for asynchronous
   xmlHttp.send(body);
 }
 
 function onsubmit(e) {
     console.log('obey!work!');
-    fetch('POST', '/login', function(resp) {
+    fetch({method: 'POST', url: '/login', body}, function(resp) {
       console.log(resp)
     })
     return false;

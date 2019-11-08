@@ -21,29 +21,30 @@ from views import index
 import async_timeout
 from db_auth import check_credentials
 from settings import config
-
+from db import users
 
 async def user_handler(request):
-  # await check_permission(request, 'protected')
-  response = {'user': 'vasya'}
-  return web.json_response(response)
-
-async def users(request):
-  response = {'id':  1, 'name': 'vasya'}
-  return web.json_response(response)
+  await check_permission(request, 'protected')
+  db_engine = request.app.db_engine
+  async with db_engine.acquire() as conn:
+    users_recs = []
+    async for user in conn.execute(users.select()):
+      users_recs += [dict(id=user[0], role=user[1])]
+    print(type(users_recs), users_recs)
+    return web.json_response(users_recs)
 
 async def login(request):
   response = web.HTTPFound('/')
   form = await request.post()
   login = form.get('login')
   password = form.get('password')
-  print(login, password)
   db_engine = request.app.db_engine
   if await check_credentials(db_engine, login, password):
     await remember(request, response, login)
     raise response
 
-  raise web.HTTPUnauthorized(body=b'Invalid username/password combination')
+  raise web.HTTPUnauthorized(
+    body=b'Invalid username/password combination')
 
 
 async def init(loop):

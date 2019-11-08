@@ -7,5 +7,14 @@ html, body {
 }
 
 .content {
+    background-color: lightcyan;
+}
+
+.login__form-pink {
     background-color: pink;
+    padding: 100px 50px;
+}
+
+.top-100 {
+    padding-top: 100px;
 }

@@ -21,4 +21,23 @@ async def root_handler(req):
 
 user='trifonovdmitry',
                                  database='aiohttp_security',
+
+
                                  host='127.0.0.1'
+
+
+-d "param1=value1&param2=value2"
+curl -X POST -d '{"user":"admin", "password": "password"}' 127.1:9001/login -v -c cookie.txt
+
+# response = web.HTTPFound('/')
+  # # response = web.json_response({'status': 200})
+  # form = await request.json()
+  # login = form.get('user')
+  # password = form.get('password')
+  # print(login, password)
+  # db_engine = request.app.db_engine
+  # if await check_credentials(db_engine, login, password):
+  #   await remember(request, response, login, max_age=30 * 24 * 3600)
+  #   raise response
+  #
+  # raise web.HTTPUnauthorized(body=b'Invalid username/password combination')
