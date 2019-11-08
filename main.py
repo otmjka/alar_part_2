@@ -4,7 +4,6 @@ from aiohttp_security import (
     remember, forget, authorized_userid,
     check_permission, check_authorized,
 )
-import aiohttp_cors
 import aiohttp_jinja2
 import jinja2
 from aiohttp_session import setup as setup_session
@@ -21,6 +20,7 @@ from db_auth import DBAuthorizationPolicy
 from views import index
 import async_timeout
 from db_auth import check_credentials
+from settings import config
 
 
 async def user_handler(request):
@@ -28,6 +28,9 @@ async def user_handler(request):
   response = {'user': 'vasya'}
   return web.json_response(response)
 
+async def users(request):
+  response = {'id':  1, 'name': 'vasya'}
+  return web.json_response(response)
 
 async def login(request):
   response = web.HTTPFound('/')
@@ -41,11 +44,15 @@ async def login(request):
     raise response
 
   raise web.HTTPUnauthorized(body=b'Invalid username/password combination')
+
+
 async def init(loop):
-  redis_pool = await create_pool(('localhost', 6379))
-  dbengine = await create_engine(user='trifonovdmitry',
-                                 database='aiohttp_security',
-                                 host='127.0.0.1')
+
+  redis_opts = (config['redis']['host'], config['redis']['port'])
+  redis_pool = await create_pool(redis_opts)
+  print(config['postgres'])
+  # ** config['postgres']
+  dbengine = await create_engine(database = 'aiohttp_security', user='admin')
   app = web.Application()
   app.db_engine = dbengine
   setup_session(app, RedisStorage(redis_pool))
@@ -67,8 +74,15 @@ async def init(loop):
 
 
   handler = app._make_handler()
-  srv = await loop.create_server(handler, '127.0.0.1', 9001)
-  print('Server started at http://127.0.0.1:9001')
+
+  app_conf = config['app']
+  srv = await loop.create_server(handler,
+                                 app_conf['host'],
+                                 app_conf['port'])
+
+  print('Server started at http://{}:{}',
+        format(str(app_conf['host']), str(app_conf['port'])))
+
   return srv, app, handler
 
 async def finalize(srv, app, handler):
