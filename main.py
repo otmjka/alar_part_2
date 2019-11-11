@@ -19,10 +19,14 @@ from middlewares import setup_middlewares
 
 
 async def init(loop):
+  # Redis
   redis_opts = (config['redis']['host'], config['redis']['port'])
   redis_pool = await create_pool(redis_opts)
 
-  dbengine = await create_engine(database = 'aiohttp_security', user = 'trifonovdmitry')
+  # SQLAlchemy
+  sa_cfg = config['postgres']
+  dbengine = await create_engine(database=sa_cfg.get('database', 'aiohttp_security'),
+                                 user=sa_cfg.get('user', 'admin'))
 
   app = web.Application()
   app.db_engine = dbengine
@@ -31,11 +35,8 @@ async def init(loop):
   setup_security(app,
                  SessionIdentityPolicy(),
                  DBAuthorizationPolicy(dbengine))
-
   aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('./templates'))
-
   setup_routes(app)
-
   setup_middlewares(app)
 
 
