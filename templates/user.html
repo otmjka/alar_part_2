@@ -1,0 +1,12 @@
+{% if u %}
+<tr>
+    <td>{{ u.id }}</td>
+    <td>{{ u.login }}</td>
+    <td>{{ u.is_superuser }}</td>
+    <td>
+        {{ 'No' if not u.disabled else 'Yes' }}
+    </td>
+    <td>{{ u.permissions }}</td>
+    <td><a href="/users/{{ u.id }}">Edit</a></td>
+</tr>
+{% endif %}

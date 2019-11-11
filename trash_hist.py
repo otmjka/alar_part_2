@@ -41,3 +41,16 @@ curl -X POST -d '{"user":"admin", "password": "password"}' 127.1:9001/login -v -
   #   raise response
   #
   # raise web.HTTPUnauthorized(body=b'Invalid username/password combination')
+
+forget, authorized_userid,
+    check_permission, check_authorized,
+
+# print(type(users_recs), users_recs)
+    # return web.json_response(users_recs)
+
+# router = app.router
+  # router.add_get('/', index)
+  # router.add_get('/users', user_handler)
+
+print(config['postgres'])
+# ** config['postgres']

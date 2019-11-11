@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+  {% if error %}
+    <div class="alert alert-primary" role="alert">
+      {{ error_msg }}
+    </div>
+  {% endif %}
+{% endblock %}

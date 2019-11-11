@@ -1,9 +1,5 @@
 import asyncio
-import aiohttp
-from aiohttp_security import (
-    remember, forget, authorized_userid,
-    check_permission, check_authorized,
-)
+
 import aiohttp_jinja2
 import jinja2
 from aiohttp_session import setup as setup_session
@@ -16,46 +12,21 @@ from aioredis import create_pool
 from aiohttp import web
 
 from db_auth import DBAuthorizationPolicy
-# from handlers import Web
-from views import index
-import async_timeout
-from db_auth import check_credentials
 from settings import config
-from db import users
 
-async def user_handler(request):
-  await check_permission(request, 'protected')
-  db_engine = request.app.db_engine
-  async with db_engine.acquire() as conn:
-    users_recs = []
-    async for user in conn.execute(users.select()):
-      users_recs += [dict(id=user[0], role=user[1])]
-    print(type(users_recs), users_recs)
-    return web.json_response(users_recs)
-
-async def login(request):
-  response = web.HTTPFound('/')
-  form = await request.post()
-  login = form.get('login')
-  password = form.get('password')
-  db_engine = request.app.db_engine
-  if await check_credentials(db_engine, login, password):
-    await remember(request, response, login)
-    raise response
-
-  raise web.HTTPUnauthorized(
-    body=b'Invalid username/password combination')
+from routes import setup_routes
+from middlewares import setup_middlewares
 
 
 async def init(loop):
-
   redis_opts = (config['redis']['host'], config['redis']['port'])
   redis_pool = await create_pool(redis_opts)
-  print(config['postgres'])
-  # ** config['postgres']
-  dbengine = await create_engine(database = 'aiohttp_security', user='admin')
+
+  dbengine = await create_engine(database = 'aiohttp_security', user = 'trifonovdmitry')
+
   app = web.Application()
   app.db_engine = dbengine
+  # Auth
   setup_session(app, RedisStorage(redis_pool))
   setup_security(app,
                  SessionIdentityPolicy(),
@@ -63,15 +34,9 @@ async def init(loop):
 
   aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('./templates'))
 
-  router = app.router
-  router.add_get('/', index)
-  router.add_get('/users', user_handler)
-  router.add_route('POST', '/login', login, name='login')
+  setup_routes(app)
 
-  router.add_static('/static/',
-                        path='./static',
-                        name='static')
-
+  setup_middlewares(app)
 
 
   handler = app._make_handler()
@@ -81,20 +46,20 @@ async def init(loop):
                                  app_conf['host'],
                                  app_conf['port'])
 
-  print('Server started at http://{}:{}',
-        format(str(app_conf['host']), str(app_conf['port'])))
+  print('Server started at http://{}:{}'.format(str(app_conf['host']), str(app_conf['port'])))
 
   return srv, app, handler
 
+
 async def finalize(srv, app, handler):
+  # TODO: correct
   sock = srv.sockets[0]
   app.loop.remove_reader(sock.fileno())
   sock.close()
-
-  await handler.finish_connections(1.0)
   srv.close()
   await srv.wait_closed()
   await app.finish()
+
 
 def main():
   loop = asyncio.get_event_loop()

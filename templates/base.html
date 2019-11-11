@@ -11,6 +11,9 @@
     {% endblock %}
   </head>
   <body>
+  {% if user %}
+    {% include 'header.html' %}
+  {% endif %}
     <div class="container-fluid content min-100">
       {% block content %}
       {% endblock %}
