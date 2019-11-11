@@ -29,7 +29,7 @@ async def main():
     for part in fetch_all:
       result += part
 
-    sorted_result = sorted(result, lambda key: key['id'])
+    sorted_result = sorted(result, key=lambda key: key['id'])
     print(sorted_result)
     return result
 
