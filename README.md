@@ -7,13 +7,13 @@ python -m venv env
 source env/bin/activate
 
 # install dependensies
-pip install -r requeriments.txt
+pip install -r requirements.txt 
 
 ```
 
 ## db setup
 
-psql aiohttp_security < sql/init_db.sql
+psql template1 < sql/init_db.sql
 psql aiohttp_security < sql/sample_data.sql
 
 # install bootstrap
