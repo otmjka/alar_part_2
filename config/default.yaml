@@ -1,7 +1,7 @@
 # config/default.yaml
 postgres:
   database: aiohttp_security 
-  user: admin
+  user: aiohttp_security
   host: localhost
   port: 5432
 redis:
